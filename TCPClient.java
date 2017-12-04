@@ -110,25 +110,29 @@ public class TCPClientFile
 	public static void main(String[] args) throws Exception
 	{
 		TCPClientFile[] myChatClient = new TCPClientFile[] {new TCPClientFile(),new TCPClientFile(),new TCPClientFile(),new TCPClientFile(),new TCPClientFile()};
-		int port = 3334;
+		
 
 		String[] fileNames = { "file1/newp1", "file1/newp2", "file1/newp3", "file1/newp4", "file1/newp5" };
-
+		Thread thread = new Thread(new Runnable() {
+			int port = 3334;
+			public void run() {
 		for (int i = 0; i < 5; i++)
 
 		{
-
 			myChatClient[i].createSocket(fileNames[i], port);
-
 			port++;
 
-		}
+		}}});
+		thread.start();
+		thread.join();
 		
-		new FileMerger().mergeFiles(new File[] { new File("file1/newp1"), new File("file1/newp2"),
+		FileMerger f = new FileMerger(new File[] { new File("file1/newp1"), new File("file1/newp2"),
 				new File("file1/newp3"), new File("file1/newp4"), new File("file1/newp5"), },
 				new File("file1/100Mb File"));
-
-
+		
+		
+		f.start();
+		f.join();
 	}
 
 }
