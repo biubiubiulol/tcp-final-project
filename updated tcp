@@ -123,7 +123,12 @@ public class TCPClientFile
 			port++;
 
 		}
-
+		FileMerger f = new FileMerger(new File[] { new File("file1/newp1"), new File("file1/newp2"),
+				new File("file1/newp3"), new File("file1/newp4"), new File("file1/newp5"), },
+				new File("file1/100Mb File"));
+		
+		f.start();
+		f.join();
 	}
 
 }
