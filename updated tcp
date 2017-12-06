@@ -5,40 +5,36 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-public class TCPClientFile
+public class TCPClientFile extends Thread
 {
 	private Socket socket = null;
 	private DataInputStream inStream = null;
 	private DataOutputStream outStream = null;
+	private String fileName;
+	private int port;
 
-	public TCPClientFile()
+	public TCPClientFile(String fileName,int port)
 	{
-
+		this.fileName = fileName;
+		this.port = port;
 	}
-
-	public void createSocket(String fileName,int port)
+	public void run()
 	{
-		Thread thread = new Thread(new Runnable()
+		try
 		{
-			public void run()
-			{
-				try
-				{
-					// connect to localHost at given port #
-					socket = new Socket("localHost", port);
-					System.out.println("Connected");
-					// fetch the streams
-					inStream = new DataInputStream(socket.getInputStream());
-					outStream = new DataOutputStream(socket.getOutputStream());
-					receiveFile(fileName);
-				} catch (Exception u)
-				{
-					u.printStackTrace();
-				}
-			}
-		});
-		thread.start();
+			// connect to localHost at given port #
+			socket = new Socket("localHost", port);
+			System.out.println("Connected");
+			// fetch the streams
+			inStream = new DataInputStream(socket.getInputStream());
+			outStream = new DataOutputStream(socket.getOutputStream());
+			receiveFile(fileName);
+		} catch (Exception u)
+		{
+			u.printStackTrace();
+		}
 	}
+
 
 	public void receiveFile(String fileName)
 	{
@@ -109,26 +105,28 @@ public class TCPClientFile
 
 	public static void main(String[] args) throws Exception
 	{
-		TCPClientFile[] myChatClient = new TCPClientFile[] {new TCPClientFile(),new TCPClientFile(),new TCPClientFile(),new TCPClientFile(),new TCPClientFile()};
-		int port = 3334;
 
-		String[] fileNames = { "file1/newp1", "file1/newp2", "file1/newp3", "file1/newp4", "file1/newp5" };
-
+		TCPClientFile[] myChatClient = new TCPClientFile[5];	
+		String[] fileNames = { "file1/newp1", "file1/newp2", "file1/newp3", "file1/newp4", "file1/newp5" };		
+			int port = 3334;
+			
 		for (int i = 0; i < 5; i++)
 
 		{
-
-			myChatClient[i].createSocket(fileNames[i], port);
-
+			myChatClient[i] = new TCPClientFile(fileNames[i],port);
 			port++;
-
+			myChatClient[i].start();
+			myChatClient[i].join();
 		}
+			
+//		
 		FileMerger f = new FileMerger(new File[] { new File("file1/newp1"), new File("file1/newp2"),
 				new File("file1/newp3"), new File("file1/newp4"), new File("file1/newp5"), },
 				new File("file1/100Mb File"));
-		
+
 		f.start();
 		f.join();
+		
 	}
 
 }
